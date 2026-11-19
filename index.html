@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>造景贴纸 · 豆包工位小角落</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Baloo+2:wght@500;600;700&family=ZCOOL+KuaiLe&display=swap">
+<style>
+/* ================= 白桌面 · 奶油贴纸纸界面 ================= */
+:root{
+  --brown:#7a6652;
+  --cream:#fbf8f1;
+  --paper:#f1f0eb;
+  --icon-bg:rgba(122,98,78,.16);
+  --icon-line:rgba(96,76,58,.30);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Baloo 2','ZCOOL KuaiLe',system-ui,sans-serif;
+  color:var(--brown);
+  background:url('assets/bg_game.png') center/cover fixed no-repeat;
+  user-select:none;
+  cursor:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cg stroke='%237a6652' stroke-width='1.6' fill='%23fbf7ef' stroke-linejoin='round'%3E%3Crect x='9' y='3' width='5' height='13' rx='2.5'/%3E%3Crect x='7' y='13' width='17' height='13' rx='7'/%3E%3C/g%3E%3Cpath d='M14 20v4M11 21.5l1.5 2.5M17 21.5l-1.5 2.5' stroke='%237a6652' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") 11 5, auto;
+}
+button{font-family:inherit;color:var(--brown);cursor:inherit;background:none;border:none;}
+img{display:block;pointer-events:none;}
+svg{display:block;}
+
+/* Menu */
+#menu-btn{
+  position:fixed;left:26px;top:16px;z-index:60;
+  background:var(--cream);border:2px solid rgba(96,76,58,.4);border-radius:12px;
+  height:52px;padding:0 20px;display:flex;align-items:center;gap:12px;
+  font-size:26px;font-weight:700;letter-spacing:1px;color:#6b5a48;
+  box-shadow:0 3px 8px rgba(96,76,58,.14);
+}
+#menu-btn:active{transform:translateY(2px);box-shadow:none;}
+#menu-btn svg{width:26px;height:26px;stroke:#6b5a48;stroke-width:3;fill:none;stroke-linecap:round;}
+#menu-pop{
+  position:fixed;left:26px;top:76px;z-index:60;width:188px;
+  background:var(--cream);border:2px solid rgba(96,76,58,.35);border-radius:14px;
+  box-shadow:0 10px 24px rgba(96,76,58,.2);padding:8px;display:none;
+}
+#menu-pop.show{display:block;}
+#menu-pop button{
+  width:100%;text-align:left;padding:10px 14px;border-radius:10px;font-size:17px;
+  display:flex;align-items:center;gap:10px;color:#6b5a48;
+}
+#menu-pop button:hover{background:#f0e9dc;}
+#menu-pop svg{width:19px;height:19px;stroke:#6b5a48;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+/* 左侧竖排工具 */
+#left-tools{position:fixed;left:26px;top:208px;z-index:50;display:flex;flex-direction:column;gap:14px;}
+.tool-btn{
+  width:58px;height:58px;border-radius:13px;
+  background:var(--icon-bg);border:2px solid var(--icon-line);
+  display:flex;align-items:center;justify-content:center;
+  color:#f6f1e7;transition:background .12s,transform .08s;
+}
+.tool-btn:hover{background:rgba(122,98,78,.26);}
+.tool-btn:active{transform:scale(.94);}
+.tool-btn.active{background:var(--cream);border-color:rgba(96,76,58,.45);color:var(--brown);}
+.tool-btn svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* 右侧撤销重做 */
+#right-tools{position:fixed;right:28px;top:44%;z-index:50;display:flex;flex-direction:column;gap:16px;}
+.round-tool{
+  width:60px;height:60px;border-radius:13px;
+  background:var(--icon-bg);border:2px solid var(--icon-line);
+  display:flex;align-items:center;justify-content:center;color:#f6f1e7;
+  transition:background .12s,transform .08s;
+}
+.round-tool:hover{background:rgba(122,98,78,.26);}
+.round-tool:active{transform:scale(.94);}
+.round-tool:disabled{opacity:.35;}
+.round-tool svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* 工作区 */
+#mat{position:fixed;left:150px;right:14px;top:62px;bottom:24px;background:transparent;overflow:hidden;}
+
+/* 贴纸纸 */
+#sheet-wrap{
+  position:absolute;left:22px;top:50%;transform:translateY(-50%);
+  width:340px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:20;
+}
+.sheet-tabs{
+  display:flex;gap:6px;background:#e6e1d6;border:1px solid #d8d1c3;border-radius:999px;padding:4px;
+}
+.sheet-tab{padding:7px 20px;border-radius:999px;font-size:16px;color:#9c8f7b;transition:all .12s;}
+.sheet-tab.on{background:var(--cream);color:#6b5a48;box-shadow:0 2px 6px rgba(96,76,58,.16);font-weight:600;}
+#scene-back{
+  display:none;width:100%;align-items:center;justify-content:center;gap:8px;
+  background:var(--cream);border:1.5px solid #d8d1c3;border-radius:999px;
+  padding:8px;font-size:15px;color:#6b5a48;box-shadow:0 2px 6px rgba(96,76,58,.12);
+}
+#scene-back.show{display:flex;}
+#scene-back:active{transform:scale(.98);}
+.sheet{
+  width:100%;max-height:66vh;overflow-y:auto;
+  background:var(--paper);border:1px solid #ded9ce;border-radius:18px;
+  box-shadow:0 10px 22px rgba(96,76,58,.18);
+  padding:16px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;
+}
+.sheet::-webkit-scrollbar{width:6px;}
+.sheet::-webkit-scrollbar-thumb{background:#d3cdbf;border-radius:3px;}
+/* 普通贴纸：无框无字 */
+.asset{border-radius:14px;padding:6px;display:flex;align-items:center;justify-content:center;transition:background .1s,transform .1s;}
+.asset:hover{background:rgba(255,243,219,.85);transform:translateY(-1px);}
+.asset:active{transform:scale(.96);}
+.asset img{width:100%;height:84px;object-fit:contain;}
+.asset.used img{filter:grayscale(1) opacity(.16);}
+.asset.used:hover img{filter:grayscale(1) opacity(.28);}
+/* 场景封面卡片 */
+.sheet.scenes{grid-template-columns:1fr;}
+.scene-card{
+  background:#faf6ee;border:1.5px solid #e4ddd0;border-radius:16px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;transition:background .1s,transform .1s;
+}
+.scene-card:hover{background:#fff4df;transform:translateY(-1px);}
+.scene-card:active{transform:scale(.98);}
+.scene-card img{width:100%;height:118px;object-fit:contain;}
+.scene-card span{font-size:16px;text-align:center;color:#7d6d5b;}
+
+/* 画布 */
+#stage{position:absolute;left:392px;right:86px;top:24px;bottom:24px;display:flex;align-items:center;justify-content:center;}
+#viewport{position:relative;z-index:1;}
+#canvas{
+  width:1536px;height:1536px;position:relative;transform-origin:0 0;
+  border-radius:16px;overflow:hidden;border:2px solid #e0d9cc;
+  box-shadow:0 12px 28px rgba(96,76,58,.22);
+  background:#fff;
+}
+#mat.theme-workstation #canvas{border-color:#ded6c7;background:#fff;}
+#bg-workstation{position:absolute;inset:0;width:1536px;height:1536px;display:none;}
+#sticker-layer{position:absolute;inset:0;}
+#overlay{position:absolute;left:0;top:0;width:1536px;height:1536px;transform-origin:0 0;pointer-events:none;}
+.sel-box{position:absolute;transform-origin:center center;}
+.sel-box .frame{position:absolute;inset:0;border:3px dashed rgba(122,98,78,.65);border-radius:10px;}
+#empty-tip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+#empty-tip .bubble{
+  background:rgba(255,255,255,.65);border:2.5px dashed rgba(122,98,78,.35);
+  border-radius:22px;padding:26px 36px;text-align:center;color:#8a7660;
+}
+#empty-tip h2{font-size:34px;letter-spacing:3px;}
+#empty-tip p{font-size:18px;margin-top:10px;}
+
+/* 贴纸 & 浮层手柄 */
+.sticker{position:absolute;transform-origin:center center;touch-action:none;}
+.sticker img{width:100%;height:100%;}
+.handle{
+  position:absolute;width:28px;height:28px;border-radius:50%;
+  border:2px solid rgba(96,76,58,.45);box-shadow:0 2px 6px rgba(96,76,58,.28);
+  display:flex;align-items:center;justify-content:center;touch-action:none;z-index:5;
+  background:var(--cream);pointer-events:auto;
+}
+.handle-scale{right:-15px;bottom:-15px;cursor:nwse-resize;}
+.handle-scale::after{content:"";width:12px;height:12px;border-radius:4px;background:#e0a7b0;}
+.handle-rotate{left:50%;top:-40px;transform:translateX(-50%);cursor:grab;background:#efd8a2;}
+.handle-rotate::after{content:"";width:12px;height:12px;border:2.5px solid #8a7450;border-radius:50%;border-top-color:transparent;border-right-color:transparent;transform:rotate(45deg);margin-left:1px;}
+.handle-rotate::before{content:"";position:absolute;left:50%;top:100%;width:2px;height:12px;background:rgba(96,76,58,.35);}
+
+/* 选中浮动工具组 */
+#pop-toolbar{
+  position:absolute;right:26px;bottom:22px;z-index:30;
+  background:var(--cream);border:2px solid rgba(96,76,58,.35);border-radius:999px;
+  padding:8px 12px;display:none;gap:6px;box-shadow:0 8px 20px rgba(96,76,58,.22);
+}
+#pop-toolbar.show{display:flex;}
+.tbtn{
+  width:42px;height:42px;border-radius:50%;background:#efe8da;
+  border:1.5px solid #d6ccba;font-size:17px;color:#7d6d5b;
+  display:flex;align-items:center;justify-content:center;transition:transform .08s,background .1s;
+}
+.tbtn:hover{background:#f6ecdb;}
+.tbtn:active{transform:scale(.9);}
+.tbtn.danger{background:#f1d1d1;border-color:#e0b0b0;color:#ac5f5f;}
+
+#toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);
+  background:rgba(84,70,56,.92);color:#fff;padding:11px 24px;border-radius:999px;
+  font-size:15px;opacity:0;pointer-events:none;transition:all .25s;z-index:99;
+}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+#asset-src{display:none;}
+
+/* 窄屏 */
+@media (max-width:900px){
+  #mat{left:104px;right:10px;top:56px;bottom:10px;}
+  #menu-btn{left:12px;top:10px;height:44px;padding:0 12px;font-size:18px;}
+  #menu-pop{left:12px;top:60px;}
+  #left-tools{left:14px;top:140px;gap:10px;}
+  .tool-btn{width:46px;height:46px;}
+  .tool-btn svg{width:22px;height:22px;}
+  #right-tools{right:12px;gap:10px;}
+  .round-tool{width:48px;height:48px;}
+  #sheet-wrap{left:12px;right:12px;bottom:10px;top:auto;transform:none;width:auto;gap:8px;}
+  .sheet{max-height:150px;grid-template-columns:repeat(4,1fr);padding:10px;gap:6px;}
+  .sheet.scenes{grid-template-columns:repeat(2,1fr);}
+  .asset img{height:46px;}
+  .scene-card img{height:60px;}
+  #stage{left:10px;right:10px;top:16px;bottom:170px;}
+}
+</style>
+</head>
+<body>
+
+<button id="menu-btn">
+  <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  Menu
+</button>
+<div id="menu-pop">
+  <button data-menu="reset"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>重置空白</button>
+  <button data-menu="clear"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13"/></svg>全部清空</button>
+  <button data-menu="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9.9-.9 1.7"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>玩法说明</button>
+</div>
+
+<nav id="left-tools">
+  <button class="tool-btn active" id="btn-theme" title="切换背景">
+    <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-.9 2-1.8 0-.7-.4-1.2-.9-1.7-.5-.5-.9-1-.9-1.7 0-1 .8-1.8 1.8-1.8H16a5 5 0 0 0 5-5c0-3.3-4-6-9-6Z"/><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="7.8" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.5" cy="7.8" r="1.2" fill="currentColor" stroke="none"/></svg>
+  </button>
+  <button class="tool-btn" id="btn-camera" title="保存截图">
+    <svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.6"/></svg>
+  </button>
+  <button class="tool-btn" id="btn-music" title="音乐">
+    <svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
+  </button>
+  <button class="tool-btn" id="btn-dup" title="复制选中贴纸">
+    <svg viewBox="0 0 24 24"><rect x="4" y="8" width="12" height="12" rx="2"/><path d="M8 4h10a2 2 0 0 1 2 2v10"/></svg>
+  </button>
+  <button class="tool-btn" id="btn-help" title="玩法说明">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9.9-.9 1.7"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+  </button>
+</nav>
+
+<nav id="right-tools">
+  <button class="round-tool" id="btn-undo" title="撤销">
+    <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+  </button>
+  <button class="round-tool" id="btn-redo" title="重做">
+    <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg>
+  </button>
+</nav>
+
+<div id="mat">
+  <div id="sheet-wrap">
+    <div class="sheet-tabs">
+      <button class="sheet-tab on" data-tab="character">角色</button>
+      <button class="sheet-tab" data-tab="item">物品</button>
+      <button class="sheet-tab" data-tab="scene">场景</button>
+    </div>
+    <button id="scene-back">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回场景选择
+    </button>
+    <div class="sheet" id="asset-list"></div>
+  </div>
+
+  <div id="stage">
+    <div id="viewport">
+      <div id="canvas">
+        <img id="bg-workstation" src="assets/bg_workstation.png" alt="">
+        <div id="sticker-layer"></div>
+        <div id="empty-tip">
+          <div class="bubble">
+            <h2>空空的小角落</h2>
+            <p>从左边贴纸纸上揭一张，开始布置豆包的工位吧</p>
+          </div>
+        </div>
+      </div>
+      <div id="overlay"></div>
+    </div>
+  </div>
+
+  <div id="pop-toolbar">
+    <button class="tbtn" data-act="zoomout" title="缩小">－</button>
+    <button class="tbtn" data-act="zoomin" title="放大">＋</button>
+    <button class="tbtn" data-act="rotl" title="左转">↺</button>
+    <button class="tbtn" data-act="rotr" title="右转">↻</button>
+    <button class="tbtn" data-act="flip" title="水平翻转">⇋</button>
+    <button class="tbtn" data-act="top" title="置顶">⇈</button>
+    <button class="tbtn" data-act="bottom" title="置底">⇊</button>
+    <button class="tbtn danger" data-act="del" title="删除">✕</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- 素材真实路径池（发布扫描用） -->
+<div id="asset-src">
+  <img src="assets/bg_default.png">
+  <img src="assets/bg_workstation.png">
+  <img src="assets/characters/work.png">
+  <img src="assets/characters/chair-coffee.png">
+  <img src="assets/characters/coffee.png">
+  <img src="assets/characters/stand-coffee.png">
+  <img src="assets/characters/stretch.png">
+  <img src="assets/characters/yawn.png">
+  <img src="assets/characters/talk.png">
+  <img src="assets/characters/sleep.png">
+  <img src="assets/characters/side-sleep.png">
+  <img src="assets/items/杯面.png">
+  <img src="assets/items/草莓.png">
+  <img src="assets/items/抽纸盒.png">
+  <img src="assets/items/春节_鞭炮串.png">
+  <img src="assets/items/春节_红包.png">
+  <img src="assets/items/春节_年桔盆栽.png">
+  <img src="assets/items/春节_小灯笼.png">
+  <img src="assets/items/春节_招财猫.png">
+  <img src="assets/items/春节_中国结.png">
+  <img src="assets/items/搭椅外套.png">
+  <img src="assets/items/马克杯.png">
+  <img src="assets/items/苹果.png">
+  <img src="assets/items/曲奇饼干.png">
+  <img src="assets/items/圣诞_花环.png">
+  <img src="assets/items/圣诞_礼物盒.png">
+  <img src="assets/items/圣诞_圣诞帽.png">
+  <img src="assets/items/圣诞_圣诞树.png">
+  <img src="assets/items/圣诞_圣诞袜.png">
+  <img src="assets/items/圣诞_雪人.png">
+  <img src="assets/items/手机.png">
+  <img src="assets/items/薯片袋.png">
+  <img src="assets/items/台灯.png">
+  <img src="assets/items/台历.png">
+  <img src="assets/items/头戴耳机.png">
+  <img src="assets/items/文件收纳架.png">
+  <img src="assets/items/香蕉.png">
+  <img src="assets/items/小风扇.png">
+  <img src="assets/items/小猫玩偶.png">
+  <img src="assets/items/珍珠奶茶.png">
+  <img src="assets/scenes/covers/完整工位_白底.png">
+  <img src="assets/scenes/covers/场景_会议室.png">
+  <img src="assets/scenes/covers/场景_茶水间.png">
+  <img src="assets/scenes/covers/场景_休息区.png">
+  <img src="assets/scenes/工位/办公桌.png">
+  <img src="assets/scenes/工位/笔记本.png">
+  <img src="assets/scenes/工位/笔筒.png">
+  <img src="assets/scenes/工位/地毯.png">
+  <img src="assets/scenes/工位/键盘.png">
+  <img src="assets/scenes/工位/绿植盆栽.png">
+  <img src="assets/scenes/工位/磨砂挡板.png">
+  <img src="assets/scenes/工位/人体工学椅.png">
+  <img src="assets/scenes/工位/鼠标.png">
+  <img src="assets/scenes/工位/显示器.png">
+  <img src="assets/scenes/工位/移动储物柜.png">
+  <img src="assets/scenes/会议室/玻璃隔间.png">
+  <img src="assets/scenes/会议室/地毯.png">
+  <img src="assets/scenes/会议室/会议桌.png">
+  <img src="assets/scenes/会议室/会议椅_背对.png">
+  <img src="assets/scenes/会议室/会议椅_正背面.png">
+  <img src="assets/scenes/会议室/会议椅_侧对.png">
+  <img src="assets/scenes/会议室/会议椅_侧背_左.png">
+  <img src="assets/scenes/会议室/会议椅_侧背_右.png">
+  <img src="assets/scenes/会议室/角落绿植.png">
+  <img src="assets/scenes/茶水间/吧台柜.png">
+  <img src="assets/scenes/茶水间/冰箱.png">
+  <img src="assets/scenes/茶水间/地垫.png">
+  <img src="assets/scenes/茶水间/电热水壶.png">
+  <img src="assets/scenes/茶水间/吊柜.png">
+  <img src="assets/scenes/茶水间/咖啡罐.png">
+  <img src="assets/scenes/茶水间/咖啡机.png">
+  <img src="assets/scenes/茶水间/马克杯组.png">
+  <img src="assets/scenes/茶水间/收纳书柜.png">
+  <img src="assets/scenes/茶水间/台面绿植.png">
+  <img src="assets/scenes/休息区/落地绿植.png">
+  <img src="assets/scenes/休息区/双人沙发.png">
+  <img src="assets/scenes/休息区/圆茶几.png">
+  <img src="assets/scenes/休息区/圆形地毯.png">
+</div>
+
+<script>
+/* ================= 素材数据 ================= */
+const LOGIC = 1536;
+const SAVE_KEY = 'doubao-workstation-sticker-demo-v11';
+
+/* 首屏默认铺满画布的成品工位贴纸，点击即收起，之后纯白自由拼贴 */
+const DEFAULT_STICKERS = [
+  {id:1, src:'assets/bg_default.png', name:'默认工位', kind:'item', x:0, y:0, w:1536, rot:0, flip:false, z:1, oneShot:true}
+];
+
+const CHARACTERS = [
+  ['认真工作','work'], ['坐椅喝咖啡','chair-coffee'], ['喝咖啡','coffee'],
+  ['站着喝咖啡','stand-coffee'], ['伸懒腰','stretch'], ['打哈欠','yawn'],
+  ['回头说话','talk'], ['趴桌睡觉','sleep'], ['侧趴睡觉','side-sleep']
+].map(([name, file]) => ({kind:'character', name, src:`assets/characters/${file}.png`}));
+
+const ITEM_NAMES = ['杯面','草莓','抽纸盒','春节_鞭炮串','春节_红包','春节_年桔盆栽','春节_小灯笼','春节_招财猫','春节_中国结','搭椅外套','马克杯','苹果','曲奇饼干','圣诞_花环','圣诞_礼物盒','圣诞_圣诞帽','圣诞_圣诞树','圣诞_圣诞袜','圣诞_雪人','手机','薯片袋','台灯','台历','头戴耳机','文件收纳架','香蕉','小风扇','小猫玩偶','珍珠奶茶'];
+const ITEMS = ITEM_NAMES.map(name => ({kind:'item', name, src:`assets/items/${name}.png`}));
+
+const SCENES = [
+  {key:'工位', cover:'assets/scenes/covers/完整工位_白底.png',
+   items:['办公桌','笔记本','笔筒','地毯','键盘','绿植盆栽','磨砂挡板','人体工学椅','鼠标','显示器','移动储物柜']},
+  {key:'会议室', cover:'assets/scenes/covers/场景_会议室.png',
+   items:['玻璃隔间','地毯','会议桌','会议椅_背对','会议椅_正背面','会议椅_侧对','会议椅_侧背_左','会议椅_侧背_右','角落绿植']},
+  {key:'茶水间', cover:'assets/scenes/covers/场景_茶水间.png',
+   items:['吧台柜','冰箱','地垫','电热水壶','吊柜','咖啡罐','咖啡机','马克杯组','收纳书柜','台面绿植']},
+  {key:'休息区', cover:'assets/scenes/covers/场景_休息区.png',
+   items:['落地绿植','双人沙发','圆茶几','圆形地毯']},
+].map(sc => ({
+  ...sc,
+  assets: sc.items.map(name => ({kind:'item', name, src:`assets/scenes/${sc.key}/${name}.png`}))
+}));
+
+/* ================= 状态 ================= */
+let stickers = [], selectedId = null, zCounter = 10, idCounter = 1;
+let bgMode = 'wood';
+let viewScale = 1, currentTab = 'item', currentScene = null;
+let usedSrcs = new Set();
+let history = [], hIndex = -1;
+const imgCache = {};
+
+const mat = document.getElementById('mat');
+const stage = document.getElementById('stage');
+const viewport = document.getElementById('viewport');
+const canvas = document.getElementById('canvas');
+const bgWorkstation = document.getElementById('bg-workstation');
+const layer = document.getElementById('sticker-layer');
+const overlay = document.getElementById('overlay');
+const popToolbar = document.getElementById('pop-toolbar');
+const assetList = document.getElementById('asset-list');
+const sceneBack = document.getElementById('scene-back');
+const emptyTip = document.getElementById('empty-tip');
+
+/* 预加载全部图片，加载完校正比例 */
+const ALL_SRC = [
+  ...CHARACTERS.map(a => a.src),
+  ...ITEMS.map(a => a.src),
+  ...SCENES.flatMap(sc => sc.assets.map(a => a.src)),
+  ...SCENES.map(sc => sc.cover),
+  'assets/bg_default.png',
+  'assets/bg_workstation.png'
+];
+ALL_SRC.forEach(src => {
+  const im = new Image();
+  im.onload = () => { if (stickers.length) render(); };
+  im.src = src;
+  imgCache[src] = im;
+});
+function ratioOf(src){
+  const im = imgCache[src];
+  return (im && im.naturalWidth) ? im.naturalHeight / im.naturalWidth : 1;
+}
+
+/* ================= 贴纸纸渲染（三级导航） ================= */
+function renderSheet(){
+  document.querySelectorAll('.sheet-tab').forEach(b => b.classList.toggle('on', b.dataset.tab === currentTab));
+  sceneBack.classList.toggle('show', currentTab === 'scene' && currentScene);
+  assetList.classList.toggle('scenes', currentTab === 'scene' && !currentScene);
+  assetList.innerHTML = '';
+
+  if (currentTab === 'scene' && !currentScene){
+    // 一级：四张场景封面
+    SCENES.forEach(sc => {
+      const card = document.createElement('div');
+      card.className = 'scene-card';
+      card.innerHTML = `<img src="${sc.cover}" alt=""><span>${sc.key}</span>`;
+      card.addEventListener('click', () => { currentScene = sc.key; renderSheet(); });
+      assetList.appendChild(card);
+    });
+    return;
+  }
+
+  let list;
+  if (currentTab === 'character') list = CHARACTERS;
+  else if (currentTab === 'item') list = ITEMS;
+  else list = SCENES.find(sc => sc.key === currentScene).assets;
+
+  list.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'asset' + (usedSrcs.has(a.src) ? ' used' : '');
+    div.title = usedSrcs.has(a.src) ? '再揭一张同款贴纸' : '';
+    div.innerHTML = `<img src="${a.src}" alt="">`;
+    div.addEventListener('click', () => addSticker(a));
+    assetList.appendChild(div);
+  });
+}
+document.querySelectorAll('.sheet-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentTab = btn.dataset.tab;
+    currentScene = null;
+    renderSheet();
+  });
+});
+sceneBack.addEventListener('click', () => { currentScene = null; renderSheet(); });
+
+/* ================= 贴纸增删渲染 ================= */
+function defaultSticker(a, cloned){
+  let w, x, y;
+  if (cloned){
+    w = cloned.w; x = cloned.x + 40; y = cloned.y + 40;
+  } else {
+    w = a.kind === 'character' ? LOGIC * 0.32 : LOGIC * 0.28;
+    const jitter = (idCounter % 5) * 22 - 44;
+    x = (LOGIC - w) / 2 + jitter;
+    y = (LOGIC - w * ratioOf(a.src)) / 2 + jitter;
+  }
+  return {
+    id:idCounter++, src:a.src, name:a.name, kind:a.kind,
+    x, y, w,
+    rot: cloned ? cloned.rot : 0,
+    flip: cloned ? cloned.flip : false,
+    z:++zCounter
+  };
+}
+function addSticker(a, cloned){
+  const s = defaultSticker(a, cloned);
+  stickers.push(s); selectedId = s.id;
+  usedSrcs.add(a.src);
+  render(); renderSheet(); commit();
+  if (!cloned) toast(`已揭下：${a.name}`);
+}
+function render(){
+  layer.innerHTML = '';
+  [...stickers].sort((a,b) => a.z - b.z).forEach(s => {
+    const h = s.w * ratioOf(s.src);
+    const el = document.createElement('div');
+    el.className = 'sticker';
+    el.dataset.id = s.id;
+    el.style.cssText = `left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${h}px;z-index:${s.z};transform:rotate(${s.rot}deg)`;
+    el.innerHTML = `<img src="${s.src}" style="transform:scaleX(${s.flip ? -1 : 1})">`;
+    layer.appendChild(el);
+  });
+  renderOverlay();
+  popToolbar.classList.toggle('show', selectedId !== null);
+  emptyTip.style.display = stickers.length ? 'none' : 'flex';
+}
+function renderOverlay(){
+  const s = getSelected();
+  if (!s){ overlay.innerHTML = ''; return; }
+  const h = s.w * ratioOf(s.src);
+  overlay.innerHTML = `
+    <div class="sel-box" style="left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${h}px;transform:rotate(${s.rot}deg)">
+      <div class="frame"></div>
+      <div class="handle handle-rotate" data-handle="rotate"></div>
+      <div class="handle handle-scale" data-handle="scale"></div>
+    </div>`;
+}
+const getSelected = () => stickers.find(s => s.id === selectedId) || null;
+
+/* ================= 手势 ================= */
+function toLogic(cx, cy){
+  const r = canvas.getBoundingClientRect();
+  return {x:(cx - r.left) / viewScale, y:(cy - r.top) / viewScale};
+}
+let drag = null;
+canvas.addEventListener('pointerdown', (e) => {
+  const stickerEl = e.target.closest('.sticker');
+  if (stickerEl){
+    const s = stickers.find(v => v.id === +stickerEl.dataset.id);
+    if (!s) return;
+    if (s.oneShot){
+      stickers = stickers.filter(v => v.id !== s.id);
+      selectedId = null;
+      render(); commit();
+      toast('默认场景已收起，开始自由拼贴吧');
+      return;
+    }
+    selectedId = s.id;
+    const p = toLogic(e.clientX, e.clientY);
+    drag = {mode:'move', id:s.id, startX:p.x, startY:p.y, initX:s.x, initY:s.y};
+    stickerEl.classList.add('dragging');
+  } else {
+    selectedId = null;
+  }
+  render();
+  canvas.setPointerCapture(e.pointerId);
+});
+overlay.addEventListener('pointerdown', (e) => {
+  const handleEl = e.target.closest('.handle');
+  const s = getSelected();
+  if (!handleEl || !s) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const ratio = ratioOf(s.src);
+  const cx = s.x + s.w/2, cy = s.y + s.w*ratio/2;
+  const p = toLogic(e.clientX, e.clientY);
+  drag = {
+    mode:handleEl.dataset.handle, id:s.id, initW:s.w, initRot:s.rot, cx, cy,
+    initDist:Math.hypot(p.x-cx, p.y-cy) || 1,
+    initAngle:Math.atan2(p.y-cy, p.x-cx)
+  };
+  overlay.setPointerCapture(e.pointerId);
+});
+function onPointerMove(e){
+  if (!drag) return;
+  const s = stickers.find(v => v.id === drag.id);
+  if (!s) return;
+  const p = toLogic(e.clientX, e.clientY);
+  const ratio = ratioOf(s.src);
+  if (drag.mode === 'move'){
+    s.x = drag.initX + (p.x - drag.startX);
+    s.y = drag.initY + (p.y - drag.startY);
+  } else if (drag.mode === 'scale'){
+    const dist = Math.hypot(p.x - drag.cx, p.y - drag.cy);
+    const nw = Math.max(50, drag.initW * dist / drag.initDist);
+    s.w = nw; s.x = drag.cx - nw/2; s.y = drag.cy - nw*ratio/2;
+  } else if (drag.mode === 'rotate'){
+    s.rot = drag.initRot + (Math.atan2(p.y-drag.cy, p.x-drag.cx) - drag.initAngle) * 180/Math.PI;
+  }
+  render();
+}
+canvas.addEventListener('pointermove', onPointerMove);
+overlay.addEventListener('pointermove', onPointerMove);
+function endDrag(){
+  if (!drag) return;
+  drag = null;
+  document.querySelectorAll('.sticker.dragging').forEach(el => el.classList.remove('dragging'));
+  commit();
+}
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+overlay.addEventListener('pointerup', endDrag);
+overlay.addEventListener('pointercancel', endDrag);
+
+/* ================= 浮动工具组 ================= */
+popToolbar.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  const s = getSelected();
+  if (!s) return;
+  switch(btn.dataset.act){
+    case 'zoomin':  s.w = Math.min(LOGIC*1.4, s.w*1.15); break;
+    case 'zoomout': s.w = Math.max(50, s.w*0.85); break;
+    case 'rotl':    s.rot -= 15; break;
+    case 'rotr':    s.rot += 15; break;
+    case 'flip':    s.flip = !s.flip; break;
+    case 'top':     s.z = ++zCounter; break;
+    case 'bottom':  s.z = --zCounter; break;
+    case 'del':
+      stickers = stickers.filter(v => v.id !== s.id); selectedId = null; break;
+  }
+  render(); commit();
+});
+
+/* 键盘 */
+document.addEventListener('keydown', (e) => {
+  const s = getSelected();
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z'){
+    e.preventDefault(); e.shiftKey ? redo() : undo(); return;
+  }
+  if (!s) return;
+  if (e.key === 'Delete' || e.key === 'Backspace'){
+    stickers = stickers.filter(v => v.id !== s.id); selectedId = null;
+    render(); commit();
+  } else if (e.key === 'ArrowLeft'){ s.x -= 12; render(); commit(); }
+  else if (e.key === 'ArrowRight'){ s.x += 12; render(); commit(); }
+  else if (e.key === 'ArrowUp'){ s.y -= 12; render(); commit(); }
+  else if (e.key === 'ArrowDown'){ s.y += 12; render(); commit(); }
+});
+
+/* ================= 工具按钮 ================= */
+function applyBg(){
+  mat.classList.toggle('theme-workstation', bgMode === 'workstation');
+  bgWorkstation.style.display = bgMode === 'workstation' ? 'block' : 'none';
+}
+document.getElementById('btn-theme').addEventListener('click', () => {
+  bgMode = bgMode === 'wood' ? 'workstation' : 'wood';
+  applyBg(); commit();
+  toast(bgMode === 'wood' ? '已切回白色拼贴区' : '已铺上工位参考底图');
+});
+document.getElementById('btn-music').addEventListener('click', () => toast('Demo 暂未加入背景音乐'));
+document.getElementById('btn-help').addEventListener('click', showHelp);
+document.getElementById('btn-dup').addEventListener('click', () => {
+  const s = getSelected();
+  if (!s){ toast('先点选一张贴纸再复制'); return; }
+  addSticker(s, s);
+});
+document.getElementById('btn-camera').addEventListener('click', exportImage);
+
+document.getElementById('menu-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('menu-pop').classList.toggle('show');
+});
+document.addEventListener('click', () => document.getElementById('menu-pop').classList.remove('show'));
+document.getElementById('menu-pop').addEventListener('click', (e) => {
+  const act = e.target.closest('[data-menu]')?.dataset.menu;
+  if (act === 'reset') resetBlank();
+  if (act === 'clear') clearAll();
+  if (act === 'help') showHelp();
+});
+function showHelp(){ toast('揭贴纸添加 · 拖动移动 · 粉点缩放 · 黄点旋转 · 右侧撤销重做'); }
+function clearAll(){
+  if (!stickers.length){ toast('桌面已经是空的啦'); return; }
+  stickers = []; selectedId = null; usedSrcs = new Set();
+  render(); renderSheet(); commit(); toast('已清空，贴纸纸恢复全新');
+}
+function resetBlank(){
+  stickers = []; selectedId = null; idCounter = 1; zCounter = 10;
+  bgMode = 'wood'; usedSrcs = new Set(); currentTab = 'item'; currentScene = null;
+  applyBg(); render(); renderSheet(); commit(); toast('已重置为空白桌面');
+}
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-redo').addEventListener('click', redo);
+
+/* ================= 截图导出 ================= */
+function exportImage(){
+  try{
+    const out = document.createElement('canvas');
+    out.width = LOGIC; out.height = LOGIC;
+    const ctx = out.getContext('2d');
+    if (bgMode === 'workstation'){
+      ctx.drawImage(imgCache['assets/bg_workstation.png'], 0, 0, LOGIC, LOGIC);
+    } else {
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,LOGIC,LOGIC);
+    }
+    [...stickers].sort((a,b) => a.z-b.z).forEach(s => {
+      const w = s.w, h = w * ratioOf(s.src);
+      ctx.save();
+      ctx.translate(s.x+w/2, s.y+h/2);
+      ctx.rotate(s.rot*Math.PI/180);
+      ctx.scale(s.flip ? -1 : 1, 1);
+      ctx.drawImage(imgCache[s.src], -w/2, -h/2, w, h);
+      ctx.restore();
+    });
+    const link = document.createElement('a');
+    link.href = out.toDataURL('image/png');
+    link.download = '我的豆包工位.png'; link.click();
+    toast('截图已保存');
+  }catch(err){
+    toast('本地预览受浏览器限制，发布在线版后即可导出截图');
+  }
+}
+
+/* ================= 撤销重做 & 持久化 ================= */
+function snapshot(){
+  return JSON.stringify({stickers, bgMode, idCounter, zCounter, used:[...usedSrcs]});
+}
+function applySnapshot(str){
+  const d = JSON.parse(str);
+  stickers = d.stickers; bgMode = d.bgMode || 'wood';
+  idCounter = d.idCounter || 1; zCounter = d.zCounter || 10;
+  usedSrcs = new Set(d.used || []);
+  if (!stickers.some(s => s.id === selectedId)) selectedId = null;
+  applyBg(); render(); renderSheet(); save(); refreshUndoBtn();
+}
+function commit(){
+  const next = snapshot();
+  if (history[hIndex] === next){ save(); return; }
+  history = history.slice(0, hIndex+1);
+  history.push(next);
+  if (history.length > 50) history.shift();
+  hIndex = history.length - 1;
+  save(); refreshUndoBtn();
+}
+function undo(){ if (hIndex > 0){ hIndex--; applySnapshot(history[hIndex]); } }
+function redo(){ if (hIndex < history.length-1){ hIndex++; applySnapshot(history[hIndex]); } }
+function refreshUndoBtn(){
+  document.getElementById('btn-undo').disabled = hIndex <= 0;
+  document.getElementById('btn-redo').disabled = hIndex >= history.length-1;
+}
+function save(){ try{ localStorage.setItem(SAVE_KEY, snapshot()); }catch(err){} }
+function load(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (!Array.isArray(d.stickers)) return false;
+    stickers = d.stickers; bgMode = d.bgMode || 'wood';
+    idCounter = d.idCounter || 1; zCounter = d.zCounter || 10;
+    usedSrcs = new Set(d.used || []);
+    return true;
+  }catch(err){ return false; }
+}
+
+/* ================= 画布自适应 ================= */
+function fitCanvas(){
+  const aw = stage.clientWidth, ah = stage.clientHeight;
+  viewScale = Math.min(aw / LOGIC, ah / LOGIC);
+  canvas.style.transform = `scale(${viewScale})`;
+  overlay.style.transform = `scale(${viewScale})`;
+  viewport.style.width = (LOGIC * viewScale) + 'px';
+  viewport.style.height = (LOGIC * viewScale) + 'px';
+}
+new ResizeObserver(fitCanvas).observe(stage);
+
+/* ================= 启动 ================= */
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+renderSheet();
+if (!load()) {
+  stickers = DEFAULT_STICKERS.map(s => Object.assign({}, s));
+  usedSrcs = new Set();
+  idCounter = 10; zCounter = 10; selectedId = null;
+}
+applyBg();
+render();
+history = [snapshot()]; hIndex = 0;
+refreshUndoBtn(); fitCanvas();
+</script>
+</body>
+</html>
