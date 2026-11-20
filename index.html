@@ -366,6 +366,22 @@ svg{display:block;}
   <img src="assets/scenes/休息区/双人沙发.png">
   <img src="assets/scenes/休息区/圆茶几.png">
   <img src="assets/scenes/休息区/圆形地毯.png">
+  <img src="assets/scenes/covers/场景_食堂.png">
+  <img src="assets/scenes/covers/场景_演讲报告厅.png">
+  <img src="assets/scenes/食堂/高脚凳.png">
+  <img src="assets/scenes/食堂/长条餐桌.png">
+  <img src="assets/scenes/食堂/高脚吧台.png">
+  <img src="assets/scenes/食堂/灰色餐椅.png">
+  <img src="assets/scenes/食堂/水滴吊灯.png">
+  <img src="assets/scenes/食堂/食堂房间.png">
+  <img src="assets/scenes/食堂/明档窗口.png">
+  <img src="assets/scenes/演讲报告厅/白色讲台.png">
+  <img src="assets/scenes/演讲报告厅/返送音箱.png">
+  <img src="assets/scenes/演讲报告厅/花箱绿植.png">
+  <img src="assets/scenes/演讲报告厅/弧形木舞台.png">
+  <img src="assets/scenes/演讲报告厅/报告厅房间.png">
+  <img src="assets/scenes/演讲报告厅/紫色观众椅.png">
+  <img src="assets/scenes/演讲报告厅/LED大屏.png">
 </div>
 
 <script>
@@ -373,32 +389,43 @@ svg{display:block;}
 const LOGIC = 1536;
 const SAVE_KEY = 'doubao-workstation-sticker-demo-v11';
 
+/* 托管部署后静态资源会被改写为绝对 CDN 地址，运行时从锚点 img 推断资源基址；本地直接打开时为空字符串 */
+const ASSET_BASE = (() => {
+  const raw = document.getElementById('bg-workstation').getAttribute('src') || '';
+  const hit = raw.match(/^(.*?)assets\/[^/]*$/);
+  return hit ? hit[1] : '';
+})();
+
 /* 首屏默认铺满画布的成品工位贴纸，点击即收起，之后纯白自由拼贴 */
 const DEFAULT_STICKERS = [
-  {id:1, src:'assets/bg_default.png', name:'默认工位', kind:'item', x:0, y:0, w:1536, rot:0, flip:false, z:1, oneShot:true}
+  {id:1, src:ASSET_BASE+'assets/bg_default.png', name:'默认工位', kind:'item', x:0, y:0, w:1536, rot:0, flip:false, z:1, oneShot:true}
 ];
 
 const CHARACTERS = [
   ['认真工作','work'], ['坐椅喝咖啡','chair-coffee'], ['喝咖啡','coffee'],
   ['站着喝咖啡','stand-coffee'], ['伸懒腰','stretch'], ['打哈欠','yawn'],
   ['回头说话','talk'], ['趴桌睡觉','sleep'], ['侧趴睡觉','side-sleep']
-].map(([name, file]) => ({kind:'character', name, src:`assets/characters/${file}.png`}));
+].map(([name, file]) => ({kind:'character', name, src:`${ASSET_BASE}assets/characters/${file}.png`}));
 
 const ITEM_NAMES = ['杯面','草莓','抽纸盒','春节_鞭炮串','春节_红包','春节_年桔盆栽','春节_小灯笼','春节_招财猫','春节_中国结','搭椅外套','马克杯','苹果','曲奇饼干','圣诞_花环','圣诞_礼物盒','圣诞_圣诞帽','圣诞_圣诞树','圣诞_圣诞袜','圣诞_雪人','手机','薯片袋','台灯','台历','头戴耳机','文件收纳架','香蕉','小风扇','小猫玩偶','珍珠奶茶'];
-const ITEMS = ITEM_NAMES.map(name => ({kind:'item', name, src:`assets/items/${name}.png`}));
+const ITEMS = ITEM_NAMES.map(name => ({kind:'item', name, src:`${ASSET_BASE}assets/items/${name}.png`}));
 
 const SCENES = [
-  {key:'工位', cover:'assets/scenes/covers/完整工位_白底.png',
+  {key:'工位', cover:ASSET_BASE+'assets/scenes/covers/完整工位_白底.png',
    items:['办公桌','笔记本','笔筒','地毯','键盘','绿植盆栽','磨砂挡板','人体工学椅','鼠标','显示器','移动储物柜']},
-  {key:'会议室', cover:'assets/scenes/covers/场景_会议室.png',
+  {key:'会议室', cover:ASSET_BASE+'assets/scenes/covers/场景_会议室.png',
    items:['玻璃隔间','地毯','会议桌','会议椅_背对','会议椅_正背面','会议椅_侧对','会议椅_侧背_左','会议椅_侧背_右','角落绿植']},
-  {key:'茶水间', cover:'assets/scenes/covers/场景_茶水间.png',
+  {key:'茶水间', cover:ASSET_BASE+'assets/scenes/covers/场景_茶水间.png',
    items:['吧台柜','冰箱','地垫','电热水壶','吊柜','咖啡罐','咖啡机','马克杯组','收纳书柜','台面绿植']},
-  {key:'休息区', cover:'assets/scenes/covers/场景_休息区.png',
+  {key:'休息区', cover:ASSET_BASE+'assets/scenes/covers/场景_休息区.png',
    items:['落地绿植','双人沙发','圆茶几','圆形地毯']},
+  {key:'食堂', cover:ASSET_BASE+'assets/scenes/covers/场景_食堂.png',
+   items:['高脚凳','长条餐桌','高脚吧台','灰色餐椅','水滴吊灯','食堂房间','明档窗口']},
+  {key:'演讲报告厅', cover:ASSET_BASE+'assets/scenes/covers/场景_演讲报告厅.png',
+   items:['白色讲台','返送音箱','花箱绿植','弧形木舞台','报告厅房间','紫色观众椅','LED大屏']},
 ].map(sc => ({
   ...sc,
-  assets: sc.items.map(name => ({kind:'item', name, src:`assets/scenes/${sc.key}/${name}.png`}))
+  assets: sc.items.map(name => ({kind:'item', name, src:`${ASSET_BASE}assets/scenes/${sc.key}/${name}.png`}))
 }));
 
 /* ================= 状态 ================= */
@@ -427,8 +454,8 @@ const ALL_SRC = [
   ...ITEMS.map(a => a.src),
   ...SCENES.flatMap(sc => sc.assets.map(a => a.src)),
   ...SCENES.map(sc => sc.cover),
-  'assets/bg_default.png',
-  'assets/bg_workstation.png'
+  ASSET_BASE+'assets/bg_default.png',
+  ASSET_BASE+'assets/bg_workstation.png'
 ];
 ALL_SRC.forEach(src => {
   const im = new Image();
@@ -699,7 +726,7 @@ function exportImage(){
     out.width = LOGIC; out.height = LOGIC;
     const ctx = out.getContext('2d');
     if (bgMode === 'workstation'){
-      ctx.drawImage(imgCache['assets/bg_workstation.png'], 0, 0, LOGIC, LOGIC);
+      ctx.drawImage(imgCache[ASSET_BASE+'assets/bg_workstation.png'], 0, 0, LOGIC, LOGIC);
     } else {
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,LOGIC,LOGIC);
     }
